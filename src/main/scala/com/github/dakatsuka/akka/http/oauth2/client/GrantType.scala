@@ -7,4 +7,5 @@ object GrantType {
   case object ClientCredentials   extends GrantType("client_credentials")
   case object PasswordCredentials extends GrantType("password")
   case object Implicit            extends GrantType("implicit")
+  case object RefreshToken        extends GrantType("refresh_token")
 }
