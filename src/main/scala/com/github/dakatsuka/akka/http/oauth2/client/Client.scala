@@ -9,16 +9,17 @@ import com.github.dakatsuka.akka.http.oauth2.client.strategy.Strategy
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-class Client(val config: Config)(implicit system: ActorSystem) {
+class Client(config: Config)(implicit system: ActorSystem) {
   def getAuthorizeUrl[A <: GrantType](grant: A, params: Map[String, String] = Map.empty)(implicit s: Strategy[A]): Option[Uri] =
-    s.getAuthorizeUrl(this, params)
+    s.getAuthorizeUrl(config, params)
 
   def getAccessToken[A <: GrantType, OUT](grant: A, params: Map[String, String] = Map.empty)(
       f: HttpResponse => Future[OUT]
   )(implicit s: Strategy[A], ec: ExecutionContext, mat: Materializer): Future[Either[Throwable, OUT]] = {
-    val source = s.getAccessTokenSource(this, params)
+    val source = s.getAccessTokenSource(config, params)
 
     source
+      .via(connection)
       .map { response =>
         if (response.status.isFailure()) throw new Exception(response.toString())
         response
