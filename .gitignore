@@ -1,0 +1,16 @@
+/project/project
+/project/target
+/target
+/native
+/tmp
+.history
+*.pyc
+/dist
+/.idea
+/*.iml
+/out
+/.idea_modules
+/.classpath
+/.project
+/RUNNING_PID
+/.settings
