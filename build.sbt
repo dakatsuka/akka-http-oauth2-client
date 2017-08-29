@@ -32,6 +32,7 @@ scalacOptions ++= Seq(
   "-Xcheckinit",
   "-Xfatal-warnings",
   "-Xfuture",
+  "-Xlint",
   "-target:jvm-1.8"
 )
 
