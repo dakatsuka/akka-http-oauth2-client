@@ -5,13 +5,12 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
 import akka.stream.Materializer
 import akka.stream.scaladsl.{ Flow, Sink }
+import com.github.dakatsuka.akka.http.oauth2.client.Error.UnauthorizedException
 import com.github.dakatsuka.akka.http.oauth2.client.strategy.Strategy
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 class Client(config: Config)(implicit system: ActorSystem) {
-  import Client._
-
   def getAuthorizeUrl[A <: GrantType](grant: A, params: Map[String, String] = Map.empty)(implicit s: Strategy[A]): Option[Uri] =
     s.getAuthorizeUrl(config, params)
 
@@ -23,10 +22,7 @@ class Client(config: Config)(implicit system: ActorSystem) {
 
     source
       .via(connection)
-      .map { response =>
-        if (response.status.isFailure()) throw new UnauthorizedException(response)
-        response
-      }
+      .mapAsync(1)(handleError)
       .mapAsync(1)(AccessToken.apply)
       .runWith(Sink.head)
       .map(Right.apply)
@@ -39,8 +35,9 @@ class Client(config: Config)(implicit system: ActorSystem) {
     case "http"  => Http().outgoingConnection(config.site.getHost, config.site.getPort)
     case "https" => Http().outgoingConnectionHttps(config.site.getHost, config.site.getPort)
   }
-}
 
-object Client {
-  class UnauthorizedException(response: HttpResponse) extends RuntimeException(response.toString)
+  private def handleError(response: HttpResponse)(implicit ec: ExecutionContext, mat: Materializer): Future[HttpResponse] = {
+    if (response.status.isFailure()) UnauthorizedException.fromHttpResponse(response).flatMap(Future.failed(_))
+    else Future.successful(response)
+  }
 }

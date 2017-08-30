@@ -1,11 +1,10 @@
 package com.github.dakatsuka.akka.http.oauth2.client
 
-import akka.http.scaladsl.model.{ ContentTypeRange, HttpResponse }
-import akka.http.scaladsl.model.MediaTypes.`application/json`
-import akka.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshal, Unmarshaller }
+import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
-import akka.util.ByteString
-import io.circe.{ jawn, Decoder, Json }
+import com.github.dakatsuka.akka.http.oauth2.client.utils.JsonUnmarshaller
+import io.circe.Decoder
 
 import scala.concurrent.Future
 
@@ -16,23 +15,7 @@ case class AccessToken(
     refreshToken: Option[String]
 )
 
-object AccessToken {
-  def unmarshallerContentTypes: Seq[ContentTypeRange] =
-    List(`application/json`)
-
-  implicit def jsonUnmarshaller: FromEntityUnmarshaller[Json] =
-    Unmarshaller.byteStringUnmarshaller
-      .forContentTypes(unmarshallerContentTypes: _*)
-      .map {
-        case ByteString.empty => throw Unmarshaller.NoContentException
-        case data             => jawn.parseByteBuffer(data.asByteBuffer).fold(throw _, identity)
-      }
-
-  implicit def unmarshaller[A: Decoder]: FromEntityUnmarshaller[A] = {
-    def decode(json: Json) = implicitly[Decoder[A]].decodeJson(json).fold(throw _, identity)
-    jsonUnmarshaller.map(decode)
-  }
-
+object AccessToken extends JsonUnmarshaller {
   implicit def decoder: Decoder[AccessToken] = Decoder.instance { c =>
     for {
       accessToken  <- c.downField("access_token").as[String].right
