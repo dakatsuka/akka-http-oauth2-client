@@ -6,8 +6,6 @@ A Scala wrapper for OAuth 2.0 with Akka HTTP.
 
 akka-http-oauth2-client is available in sonatype repository and it targets Akka HTTP 10.0.x. There are scala 2.11 and 2.12 compatible jars available.
 
-```
-
 ```sbt
 libraryDependencies += "com.github.dakatsuka" %% "akka-http-oauth2-client" % "0.1.0"
 ```
