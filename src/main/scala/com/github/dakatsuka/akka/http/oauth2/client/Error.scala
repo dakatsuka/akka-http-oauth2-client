@@ -30,7 +30,8 @@ object Error {
     }
   }
 
-  class UnauthorizedException(code: Code, description: String, response: HttpResponse) extends RuntimeException(s"$code: $description")
+  class UnauthorizedException(val code: Code, val description: String, val response: HttpResponse)
+      extends RuntimeException(s"$code: $description")
 
   object UnauthorizedException extends JsonUnmarshaller {
     case class UnauthorizedResponse(error: String, errorDescription: String)
