@@ -32,8 +32,7 @@ scalacOptions ++= Seq(
   "-Xcheckinit",
   "-Xfatal-warnings",
   "-Xfuture",
-  "-Xlint",
-  "-target:jvm-1.8"
+  "-Xlint"
 )
 
 enablePlugins(ScalafmtPlugin)
@@ -41,8 +40,6 @@ enablePlugins(ScalafmtPlugin)
 scalafmtOnCompile := true
 
 scalafmtTestOnCompile := true
-
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-encoding", "UTF-8", "-Xlint")
 
 licenses := Seq("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
