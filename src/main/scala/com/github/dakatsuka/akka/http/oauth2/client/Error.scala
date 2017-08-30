@@ -38,8 +38,8 @@ object Error {
 
     implicit def decoder: Decoder[UnauthorizedResponse] = Decoder.instance { c =>
       for {
-        error       <- c.downField("error").as[String]
-        description <- c.downField("error_description").as[String]
+        error       <- c.downField("error").as[String].right
+        description <- c.downField("error_description").as[String].right
       } yield UnauthorizedResponse(error, description)
     }
 
