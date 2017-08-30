@@ -4,10 +4,10 @@ import akka.NotUsed
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model._
 import akka.stream.scaladsl.Source
-import com.github.dakatsuka.akka.http.oauth2.client.{ Config, GrantType }
+import com.github.dakatsuka.akka.http.oauth2.client.{ ConfigLike, GrantType }
 
 class AuthorizationCodeStrategy extends Strategy(GrantType.AuthorizationCode) {
-  override def getAuthorizeUrl(config: Config, params: Map[String, String] = Map.empty): Option[Uri] = {
+  override def getAuthorizeUrl(config: ConfigLike, params: Map[String, String] = Map.empty): Option[Uri] = {
     val uri = Uri
       .apply(config.site.toASCIIString)
       .withPath(Uri.Path(config.authorizeUrl))
@@ -16,7 +16,7 @@ class AuthorizationCodeStrategy extends Strategy(GrantType.AuthorizationCode) {
     Option(uri)
   }
 
-  override def getAccessTokenSource(config: Config, params: Map[String, String] = Map.empty): Source[HttpRequest, NotUsed] = {
+  override def getAccessTokenSource(config: ConfigLike, params: Map[String, String] = Map.empty): Source[HttpRequest, NotUsed] = {
     require(params.contains("code"))
     require(params.contains("redirect_uri"))
 

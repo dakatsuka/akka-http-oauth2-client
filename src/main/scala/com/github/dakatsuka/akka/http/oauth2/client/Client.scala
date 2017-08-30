@@ -1,16 +1,15 @@
 package com.github.dakatsuka.akka.http.oauth2.client
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
+import akka.http.scaladsl.model.{ HttpResponse, Uri }
 import akka.stream.Materializer
-import akka.stream.scaladsl.{ Flow, Sink }
+import akka.stream.scaladsl.Sink
 import com.github.dakatsuka.akka.http.oauth2.client.Error.UnauthorizedException
 import com.github.dakatsuka.akka.http.oauth2.client.strategy.Strategy
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-class Client(config: Config)(implicit system: ActorSystem) {
+class Client(config: ConfigLike)(implicit system: ActorSystem) extends ClientLike {
   def getAuthorizeUrl[A <: GrantType](grant: A, params: Map[String, String] = Map.empty)(implicit s: Strategy[A]): Option[Uri] =
     s.getAuthorizeUrl(config, params)
 
@@ -21,7 +20,7 @@ class Client(config: Config)(implicit system: ActorSystem) {
     val source = s.getAccessTokenSource(config, params)
 
     source
-      .via(connection)
+      .via(config.connection)
       .mapAsync(1)(handleError)
       .mapAsync(1)(AccessToken.apply)
       .runWith(Sink.head)
@@ -29,11 +28,6 @@ class Client(config: Config)(implicit system: ActorSystem) {
       .recover {
         case ex => Left(ex)
       }
-  }
-
-  val connection: Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]] = config.site.getScheme match {
-    case "http"  => Http().outgoingConnection(config.site.getHost, config.site.getPort)
-    case "https" => Http().outgoingConnectionHttps(config.site.getHost, config.site.getPort)
   }
 
   private def handleError(response: HttpResponse)(implicit ec: ExecutionContext, mat: Materializer): Future[HttpResponse] = {
