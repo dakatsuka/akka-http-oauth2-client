@@ -10,12 +10,12 @@ import akka.stream.scaladsl.Flow
 import scala.concurrent.Future
 
 trait ConfigLike {
-  val clientId: String
-  val clientSecret: String
-  val site: URI
-  val authorizeUrl: String
-  val tokenUrl: String
-  val tokenMethod: HttpMethod
+  def clientId: String
+  def clientSecret: String
+  def site: URI
+  def authorizeUrl: String
+  def tokenUrl: String
+  def tokenMethod: HttpMethod
 
   def connection(implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, Future[Http.OutgoingConnection]]
 }
