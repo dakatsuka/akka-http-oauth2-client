@@ -12,11 +12,12 @@ lazy val akkaHttpVersion = "10.0.9"
 lazy val circeVersion    = "0.8.0"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-http"         % akkaHttpVersion,
-  "io.circe"          %% "circe-generic"     % circeVersion,
-  "io.circe"          %% "circe-parser"      % circeVersion,
-  "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % "test",
-  "org.scalatest"     %% "scalatest"         % "3.0.3" % "test"
+  "com.typesafe.akka" %% "akka-http"                   % akkaHttpVersion,
+  "io.circe"          %% "circe-generic"               % circeVersion,
+  "io.circe"          %% "circe-parser"                % circeVersion,
+  "com.typesafe.akka" %% "akka-http-testkit"           % akkaHttpVersion % "test",
+  "org.scalatest"     %% "scalatest"                   % "3.0.3" % "test",
+  "org.scalamock"     %% "scalamock-scalatest-support" % "3.4.2" % "test"
 )
 
 scalacOptions ++= Seq(
