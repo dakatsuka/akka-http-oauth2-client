@@ -55,6 +55,9 @@ accessToken.foreach {
     ex.description // String
     ex.response    // HttpResponse
 }
+
+val newAccessToken: Future[Either[Throwable, AccessToken]] =
+  client.getAccessToken(GrantType.RefreshToken, Map("redresh_token" -> "zzzzzzzz"))
 ```
 
 ## Authors
