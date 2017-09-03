@@ -57,7 +57,7 @@ accessToken.foreach {
 }
 
 val newAccessToken: Future[Either[Throwable, AccessToken]] =
-  client.getAccessToken(GrantType.RefreshToken, Map("redresh_token" -> "zzzzzzzz"))
+  client.getAccessToken(GrantType.RefreshToken, Map("refresh_token" -> "zzzzzzzz"))
 ```
 
 ## Authors
