@@ -38,7 +38,7 @@ val config = Config(
 val client = Client(config)
 
 // Some(https://api.example.com/oauth/authorize?redirect_uri=https://example.com/oauth2/callback&response_type=code&client_id=xxxxxxxxx)
-val authorizeUrl: Option[String] =
+val authorizeUrl: Option[Uri] =
   client.getAuthorizeUrl(GrantType.AuthorizationCode, Map("redirect_uri" -> "https://example.com/oauth2/callback"))
 
 val accessToken: Future[Either[Throwable, AccessToken]] =
