@@ -35,7 +35,7 @@ val config = Config(
   site         = URI.create("https://api.example.com")
 )
 
-val client = new Client(config)
+val client = Client(config)
 
 // Some(https://api.example.com/oauth/authorize?redirect_uri=https://example.com/oauth2/callback&response_type=code&client_id=xxxxxxxxx)
 val authorizeUrl: Option[String] =
@@ -58,6 +58,32 @@ accessToken.foreach {
 
 val newAccessToken: Future[Either[Throwable, AccessToken]] =
   client.getAccessToken(GrantType.RefreshToken, Map("refresh_token" -> "zzzzzzzz"))
+```
+
+## Testing
+
+`Client` can pass mock connection into constructor.
+
+```scala
+val mock = Flow[HttpRequest].map { _ =>
+  HttpResponse(
+    status = StatusCodes.OK,
+    headers = Nil,
+    entity = HttpEntity(
+      `application/json`,
+      s"""
+         |{
+         |  "access_token": "dummy",
+         |  "token_type": "bearer",
+         |  "expires_in": 86400,
+         |  "refresh_token": "dummy"
+         |}
+      """.stripMargin
+    )
+  )
+}
+
+val client = Client(config, mock)
 ```
 
 ## Authors

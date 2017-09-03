@@ -2,9 +2,7 @@ package com.github.dakatsuka.akka.http.oauth2.client
 
 import java.net.URI
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{ HttpMethod, HttpRequest, HttpResponse }
-import akka.stream.scaladsl.Flow
+import akka.http.scaladsl.model.HttpMethod
 
 trait ConfigLike {
   def clientId: String
@@ -13,6 +11,6 @@ trait ConfigLike {
   def authorizeUrl: String
   def tokenUrl: String
   def tokenMethod: HttpMethod
-
-  def connection(implicit system: ActorSystem): Flow[HttpRequest, HttpResponse, _]
+  def getHost: String
+  def getPort: Int
 }
