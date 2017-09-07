@@ -2,6 +2,7 @@ package com.github.dakatsuka.akka.http.oauth2.client
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.headers.OAuth2BearerToken
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, Uri }
 import akka.stream.Materializer
 import akka.stream.scaladsl.{ Flow, Sink }
@@ -31,6 +32,11 @@ class Client(config: ConfigLike, connection: Option[Flow[HttpRequest, HttpRespon
         case ex => Left(ex)
       }
   }
+
+  def getConnectionWithAccessToken(accessToken: AccessToken): Flow[HttpRequest, HttpResponse, _] =
+    Flow[HttpRequest]
+      .map(_.addCredentials(OAuth2BearerToken(accessToken.accessToken)))
+      .via(connection.getOrElse(defaultConnection))
 
   private def defaultConnection: Flow[HttpRequest, HttpResponse, _] =
     config.site.getScheme match {

@@ -5,7 +5,7 @@ import java.net.URI
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.ContentTypes.`application/json`
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{ Flow, Sink, Source }
 import akka.stream.{ ActorMaterializer, Materializer }
 import com.github.dakatsuka.akka.http.oauth2.client.Error.UnauthorizedException
 import org.scalatest.concurrent.ScalaFutures
@@ -93,6 +93,43 @@ class ClientSpec extends FlatSpec with DiagrammedAssertions with ScalaFutures wi
     whenReady(result) { r =>
       assert(r.isLeft)
       assert(r.left.exists(_.isInstanceOf[UnauthorizedException]))
+    }
+  }
+
+  "#getConnectionWithAccessToken" should "return outgoing connection flow with access token" in {
+    val accessToken = AccessToken(
+      accessToken = "xxx",
+      tokenType = "bearer",
+      expiresIn = 86400,
+      refreshToken = Some("yyy")
+    )
+
+    val request = HttpRequest(HttpMethods.GET, "/v1/foo/bar")
+    val response = HttpResponse(
+      status = StatusCodes.OK,
+      headers = Nil,
+      entity = HttpEntity(
+        `application/json`,
+        s"""
+           |{
+           |  "key": "value"
+           |}
+         """.stripMargin
+      )
+    )
+
+    val mockConnection = Flow[HttpRequest]
+      .filter { req =>
+        req.headers.exists(_.is("authorization")) && req.headers.exists(_.value() == s"Bearer ${accessToken.accessToken}")
+      }
+      .map(_ => response)
+
+    val config = Config("xxx", "yyy", URI.create("https://example.com"))
+    val client = Client(config, mockConnection)
+    val result = Source.single(request).via(client.getConnectionWithAccessToken(accessToken)).runWith(Sink.head)
+
+    whenReady(result) { r =>
+      assert(r.status.isSuccess())
     }
   }
 }
