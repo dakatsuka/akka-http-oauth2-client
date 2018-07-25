@@ -28,7 +28,7 @@ class AuthorizationCodeStrategy extends Strategy(GrantType.AuthorizationCode) {
       method = config.tokenMethod,
       uri = uri,
       headers = List(
-        RawHeader("Accept", "*/*")
+        RawHeader("Accept", "application/json")
       ),
       FormData(
         params ++ Map(
