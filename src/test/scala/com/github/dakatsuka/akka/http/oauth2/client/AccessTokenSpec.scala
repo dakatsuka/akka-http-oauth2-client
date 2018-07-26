@@ -26,9 +26,10 @@ class AccessTokenSpec extends FlatSpec with DiagrammedAssertions with ScalaFutur
 
   it should "apply from HttpResponse" in {
     val accessToken  = "xxx"
-    val tokenType    = "bearer"
-    val expiresIn    = 86400
-    val refreshToken = "yyy"
+    val tokenType    = Some("bearer")
+    val expiresIn    = Some(86400)
+    val refreshToken = Some("yyy")
+    val scope        = None
 
     val httpResponse = HttpResponse(
       status = StatusCodes.OK,
@@ -38,9 +39,9 @@ class AccessTokenSpec extends FlatSpec with DiagrammedAssertions with ScalaFutur
         s"""
            |{
            |  "access_token": "$accessToken",
-           |  "token_type": "$tokenType",
-           |  "expires_in": $expiresIn,
-           |  "refresh_token": "$refreshToken"
+           |  "token_type": "bearer",
+           |  "expires_in": 86400,
+           |  "refresh_token": "yyy"
            |}
          """.stripMargin
       )
@@ -51,8 +52,9 @@ class AccessTokenSpec extends FlatSpec with DiagrammedAssertions with ScalaFutur
     whenReady(result) { token =>
       assert(token.accessToken == accessToken)
       assert(token.tokenType == tokenType)
+      assert(token.scope == scope)
       assert(token.expiresIn == expiresIn)
-      assert(token.refreshToken.contains(refreshToken))
+      assert(token.refreshToken == refreshToken)
     }
   }
 }
