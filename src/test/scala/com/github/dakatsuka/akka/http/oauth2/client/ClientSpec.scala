@@ -99,8 +99,9 @@ class ClientSpec extends FlatSpec with DiagrammedAssertions with ScalaFutures wi
   "#getConnectionWithAccessToken" should "return outgoing connection flow with access token" in {
     val accessToken = AccessToken(
       accessToken = "xxx",
-      tokenType = "bearer",
-      expiresIn = 86400,
+      tokenType = Some("bearer"),
+      scope = Some("read:org,read:user"),
+      expiresIn = Some(86400),
       refreshToken = Some("yyy")
     )
 
